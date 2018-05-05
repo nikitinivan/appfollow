@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="ui fluid action input">
+  <input type="text" id="url" placeholder="url for ">
+  <button class="ui red button" onclick="get_permissions()">Parse Permissions</button>
+</div>
+<br />
+
+<div id="output">
+
+</div>
+<script>
+
+    function get_permissions() {
+        $('#output').html('')
+        $('<img/>', {
+            src: 'https://cdnjs.cloudflare.com/ajax/libs/galleriffic/2.0.1/css/loader.gif',
+            class: "ui centered image"
+
+        }).appendTo('#output')
+        console.log($('#url').val())
+        var perm;
+        perm = $.ajax({
+            url: '/parser',
+            data: {
+                url: $('#url').val()
+            },
+            type: 'POST'
+        })
+
+        perm.done(function(data) {
+            $('#output').html('');
+            console.log(data)
+            render(data)
+        });
+
+        function render(data) {
+            var categories = data.permissions;
+            for (var category in categories){
+                var categoryContainer = $('<div/>', {
+
+                }).appendTo($('#output'))
+                var categoryHeader = $('<span/>', {
+                    text: category
+                }).appendTo(categoryContainer)
+                var categoryUl = $('<ul/>', {
+                    class: 'ullist'
+                }).appendTo(categoryContainer)
+                for (var item in categories[category]) {
+                    var categoryListItem = $('<li/>', {
+                        text: categories[category][item]
+                    }).appendTo(categoryUl)
+                }
+
+            }
+        }
+    }
+</script>
+{% endblock %}
